@@ -9,6 +9,22 @@ import (
 	"github.com/confluentinc/confluent-kafka-go/kafka"
 )
 
+type OrderPlacer struct {
+	producer *kafka.Producer
+	topic    string
+}
+
+func NewOrderPlacer(p *kafka.Producer, topic string) *OrderPlacer {
+	return &OrderPlacer{
+		producer: p,
+		topic:    topic,
+	}
+}
+
+func (op *OrderPlacer) place() {
+
+}
+
 func main() {
 	topic := "topic"
 	p, err := kafka.NewProducer(&kafka.ConfigMap{
