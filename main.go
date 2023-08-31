@@ -10,19 +10,33 @@ import (
 )
 
 type OrderPlacer struct {
-	producer *kafka.Producer
-	topic    string
+	producer   *kafka.Producer
+	topic      string
+	deliverych chan kafka.Event
 }
 
 func NewOrderPlacer(p *kafka.Producer, topic string) *OrderPlacer {
 	return &OrderPlacer{
-		producer: p,
-		topic:    topic,
+		producer:   p,
+		topic:      topic,
+		deliverych: make(chan kafka.Event, 10000),
 	}
 }
 
-func (op *OrderPlacer) place() {
+func (op *OrderPlacer) placeOrder(orderType string, size int) error {
+	err := op.producer.Produce(&kafka.Message{
+		TopicPartition: kafka.TopicPartition{Topic: &op.topic, Partition: kafka.PartitionAny},
+		Value:          []byte("FOO")},
+		delivery_chan,
+	)
 
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	<-delivery_chan
+	time.Sleep(time.Second * 2)
+	return nil
 }
 
 func main() {
